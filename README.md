@@ -5,10 +5,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ForgetMeAI/FreeDeepseekAPI/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green.svg"></a>
-  <img alt="Node.js >= 18" src="https://img.shields.io/badge/node-%3E%3D18-339933.svg">
-  <img alt="No npm dependencies" src="https://img.shields.io/badge/dependencies-0-blue.svg">
-  <img alt="OpenAI compatible" src="https://img.shields.io/badge/OpenAI-compatible-111111.svg">
+  <a href="https://github.com/ForgetMeAI/FreeDeepseekAPI/blob/main/LICENSE"><img alt="License MIT" src="https://img.shields.io/badge/license-MIT-green.svg" /></a>
+  <img alt="Node.js 18 plus" src="https://img.shields.io/badge/node-18%2B-339933.svg" />
+  <img alt="No npm dependencies" src="https://img.shields.io/badge/dependencies-0-blue.svg" />
+  <img alt="OpenAI compatible" src="https://img.shields.io/badge/OpenAI-compatible-111111.svg" />
 </p>
 
 <p align="center">
