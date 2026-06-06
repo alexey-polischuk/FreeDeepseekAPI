@@ -1,0 +1,10 @@
+node_modules/
+.env
+*.log
+auth.json
+deepseek-auth.json
+.chrome-profile-deepseek/
+*.session.json
+/tmp/deepseek_response_*
+.DS_Store
+*.pdf
