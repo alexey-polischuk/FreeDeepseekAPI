@@ -1,32 +1,34 @@
-# FreeDeepseekAPI
+# FreeDeepseekAPI — WSL Edition
 
 <p align="center">
-  <strong>Локальный OpenAI-compatible API proxy для DeepSeek Web Chat</strong>
+  <strong>Локальный OpenAI-compatible API proxy для DeepSeek Web Chat</strong><br>
+  <strong>Версия для WSL2 (Windows Subsystem for Linux)</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/ForgetMeAI/FreeDeepseekAPI/blob/main/LICENSE"><img alt="License MIT" src="https://img.shields.io/badge/license-MIT-green.svg" /></a>
+  <a href="https://github.com/alexey-polischuk/FreeDeepseekAPI/blob/main/LICENSE"><img alt="License MIT" src="https://img.shields.io/badge/license-MIT-green.svg" /></a>
   <img alt="Node.js 18 plus" src="https://img.shields.io/badge/node-18%2B-339933.svg" />
   <img alt="No npm dependencies" src="https://img.shields.io/badge/dependencies-0-blue.svg" />
   <img alt="OpenAI compatible" src="https://img.shields.io/badge/OpenAI-compatible-111111.svg" />
+  <img alt="WSL2" src="https://img.shields.io/badge/platform-WSL2-4A90D9.svg" />
 </p>
 
 <p align="center">
   <a href="#-быстрый-старт">Быстрый старт</a> •
-  <a href="#-возможности">Возможности</a> •
+  <a href="#-варианты-авторизации">Авторизация</a> •
   <a href="#-примеры-запросов">Примеры</a> •
   <a href="#-модели">Модели</a> •
   <a href="#-endpoints">Endpoints</a> •
-  <a href="#-open-webui">Open WebUI</a>
+  <a href="#-интеграции">Интеграции</a>
 </p>
 
-FreeDeepseekAPI поднимает локальный API-сервер для **DeepSeek Web Chat** (`chat.deepseek.com`) и позволяет подключать DeepSeek Web к Open WebUI, LiteLLM, Hermes, Claude Code, OpenAI SDK-style клиентам и другим OpenAI-compatible инструментам.
+FreeDeepseekAPI поднимает локальный API-сервер для **DeepSeek Web Chat** (`chat.deepseek.com`) и позволяет подключать DeepSeek Web к Open WebUI, LiteLLM, Hermes, Claude Code, OpenAI SDK и другим OpenAI-compatible клиентам — всё это работает в WSL2 на Windows.
 
-Проект работает через ваш обычный залогиненный аккаунт DeepSeek в отдельном Chrome-профиле. Локальный сервер принимает API-запросы, а дальше сам ходит в DeepSeek Web через сохранённую browser-сессию.
+Проект работает через ваш обычный залогиненный аккаунт DeepSeek в отдельном Chrome-профиле. Локальный сервер принимает API-запросы и сам ходит в DeepSeek Web через сохранённую browser-сессию.
 
-> ⚠️ Это экспериментальный web-chat proxy. DeepSeek может менять внутренний Web API без предупреждения. Для production-кейсов надёжнее официальный платный API DeepSeek.
+> Это форк [ForgetMeAI/FreeDeepseekAPI](https://github.com/ForgetMeAI/FreeDeepseekAPI), адаптированный для работы в WSL2. Убраны macOS-специфичные пути, добавлена поддержка WSLg/Snap Chromium.
 
-ForgetMeAI: https://t.me/forgetmeai
+> Внимание: Это экспериментальный web-chat proxy. DeepSeek может менять внутренний Web API без предупреждения. Для production-кейсов надёжнее официальный платный API DeepSeek.
 
 ---
 
@@ -35,34 +37,28 @@ ForgetMeAI: https://t.me/forgetmeai
 - [Что это даёт](#-что-это-даёт)
 - [Возможности](#-возможности)
 - [Быстрый старт](#-быстрый-старт)
+- [Варианты авторизации](#-варианты-авторизации)
 - [Проверка работы](#-проверка-работы)
 - [Примеры запросов](#-примеры-запросов)
-  - [Chat Completions](#chat-completions)
-  - [Reasoning](#reasoning)
-  - [Web search](#web-search)
-  - [Streaming](#streaming)
-  - [Anthropic Messages API](#anthropic-messages-api)
-  - [OpenAI Responses API](#openai-responses-api)
-  - [Tool calling](#tool-calling)
 - [Модели](#-модели)
 - [Endpoints](#-endpoints)
-- [Open WebUI](#-open-webui)
+- [Интеграции](#-интеграции)
 - [Обновить логин](#-обновить-логин)
 - [Статус проекта](#-статус-проекта)
 
 ---
 
-## ✨ Что это даёт
+## Что это даёт
 
-- Использовать DeepSeek Web как локальный API endpoint.
-- Подключать DeepSeek к Open WebUI и другим OpenAI-compatible клиентам.
-- Получать обычные JSON-ответы или streaming SSE.
-- Использовать reasoning-модели с отдельным `reasoning_content`.
-- Работать с Anthropic Messages API shim для Claude Code / Anthropic SDK.
-- Использовать OpenAI Responses API shim для новых OpenAI/Codex-style клиентов.
-- Держать отдельные web-сессии для разных агентов/users.
+- Использовать DeepSeek Web как локальный API endpoint в WSL2
+- Подключать DeepSeek к Open WebUI и другим OpenAI-compatible клиентам
+- Получать обычные JSON-ответы или streaming SSE
+- Использовать reasoning-модели с отдельным `reasoning_content`
+- Работать с Anthropic Messages API shim для Claude Code
+- Использовать OpenAI Responses API shim
+- Держать отдельные web-сессии для разных агентов/users
 
-## 🚀 Возможности
+## Возможности
 
 - **OpenAI-compatible API:** `POST /v1/chat/completions`
 - **Anthropic-compatible shim:** `POST /v1/messages`
@@ -70,53 +66,94 @@ ForgetMeAI: https://t.me/forgetmeai
 - **Streaming:** SSE chunks и обычные non-stream JSON-ответы
 - **Reasoning output:** отдельный `reasoning_content` для thinking-моделей
 - **Tool calling:** парсинг OpenAI tools, Anthropic tools и Responses function tools
-- **Model capabilities:** `GET /v1/model-capabilities` с alias → real web mode
+- **Model capabilities:** `GET /v1/model-capabilities` с alias -> real web mode
 - **Agent sessions:** отдельная DeepSeek-сессия на `user` / agent id
 - **Session recovery:** авто-сброс устаревших chains/sessions
 - **Zero dependencies:** Node.js 18+, без npm-зависимостей
+- **WSL-optimized:** поиск Chromium/Chrome по WSL/Linux путям
 
 ---
 
-## ⚡ Быстрый старт
+## Быстрый старт
+
+### Предварительные требования
+
+- WSL2 с включённым WSLg (Windows 11 или Windows 10 с поддержкой GUI)
+- Node.js 18+
+- Chromium или Google Chrome в WSL
+- Аккаунт на chat.deepseek.com
+
+### Проверка WSLg
 
 ```bash
-git clone https://github.com/ForgetMeAI/FreeDeepseekAPI.git
+echo $DISPLAY        # должно быть :0
+echo $WAYLAND_DISPLAY # должно быть wayland-0
+```
+
+Если переменные пустые — WSLg не включён. Обновите WSL: `wsl --update` из PowerShell.
+
+### Установка
+
+```bash
+git clone https://github.com/alexey-polischuk/FreeDeepseekAPI.git
 cd FreeDeepseekAPI
-npm run auth
-npm start
 ```
 
-`npm run auth` открывает меню авторизации:
-
-1. выберите пункт `1`;
-2. войдите в DeepSeek в отдельном Chrome-профиле;
-3. отправьте короткое сообщение вроде `ok`;
-4. вернитесь в терминал и нажмите Enter.
-
-`npm start` показывает меню запуска:
-
-- `1` — авторизоваться / обновить DeepSeek login
-- `2` — показать модели и статусы
-- `3` — запустить proxy
-- `4` — выйти
-
-Для headless/CI-запуска без меню:
+### Установка браузера (если нет)
 
 ```bash
-NON_INTERACTIVE=1 npm start
-# или
-SKIP_ACCOUNT_MENU=1 npm start
+# Chromium через snap (самый простой вариант в Ubuntu WSL)
+sudo snap install chromium
+
+# Или Google Chrome
+wget -O /tmp/google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install -y /tmp/google-chrome.deb
 ```
 
-По умолчанию сервер слушает:
+### Авторизация и запуск
 
-```text
-http://localhost:9655
+```bash
+# Шаг 1 — Авторизация (интерактивная, откроет окно браузера через WSLg)
+npm run auth
+
+# Шаг 2 — Запуск сервера
+NON_INTERACTIVE=1 npm start
+
+# Сервер на http://localhost:9655
 ```
 
 ---
 
-## ✅ Проверка работы
+## Варианты авторизации
+
+### Вариант 1 — Chromium/Chrome в WSL через WSLg (рекомендуется)
+
+```bash
+# Chromium
+CHROME_PATH=/snap/bin/chromium npm run auth
+
+# Google Chrome
+CHROME_PATH=/usr/bin/google-chrome-stable npm run auth
+```
+
+Откроется окно браузера через WSLg. Залогиньтесь на chat.deepseek.com, отправьте "ok", нажмите Enter в терминале.
+
+### Вариант 2 — Chrome for Testing через Puppeteer
+
+```bash
+npm install puppeteer   # скачает Chrome for Testing (~300 МБ)
+npm run auth
+```
+
+### Вариант 3 — Ручная авторизация без браузера в WSL
+
+Вытащить токен и куки из Windows Chrome и записать в `deepseek-auth.json`. Сервер после этого работает полностью headless.
+
+Подробности — в [docs/wsl-setup.md](docs/wsl-setup.md).
+
+---
+
+## Проверка работы
 
 ```bash
 curl http://localhost:9655/
@@ -124,11 +161,9 @@ curl http://localhost:9655/v1/models
 curl http://localhost:9655/v1/model-capabilities
 ```
 
-Если всё ок, `/health` вернёт статус сервера, список поддерживаемых aliases и `config_ready: true`.
-
 ---
 
-## 🧪 Примеры запросов
+## Примеры запросов
 
 ### Chat Completions
 
@@ -160,8 +195,6 @@ curl -X POST http://localhost:9655/v1/chat/completions \
 - stream: `choices[0].delta.reasoning_content`
 - usage: `usage.completion_tokens_details.reasoning_tokens`
 
-`reasoning_tokens` — приблизительная оценка по извлечённому DeepSeek Web `THINK`-тексту, потому что web stream не отдаёт официальный token usage по reasoning отдельно.
-
 ### Web search
 
 ```bash
@@ -169,7 +202,7 @@ curl -X POST http://localhost:9655/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "deepseek-chat-search",
-    "messages": [{"role": "user", "content": "Найди свежий факт про DeepSeek и ответь кратко."}],
+    "messages": [{"role": "user", "content": "Найди свежий факт про DeepSeek."}],
     "stream": false
   }'
 ```
@@ -186,7 +219,7 @@ curl -N -X POST http://localhost:9655/v1/chat/completions \
   }'
 ```
 
-### Anthropic Messages API
+### Anthropic Messages API (Claude Code)
 
 ```bash
 curl -X POST http://localhost:9655/v1/messages \
@@ -197,15 +230,6 @@ curl -X POST http://localhost:9655/v1/messages \
     "messages": [{"role": "user", "content": "Ответь ровно OK"}],
     "stream": false
   }'
-```
-
-Для Claude Code можно указывать backend напрямую:
-
-```bash
-export ANTHROPIC_BASE_URL="http://127.0.0.1:9655"
-export ANTHROPIC_AUTH_TOKEN="dummy-key"
-export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1
-claude --model deepseek-chat
 ```
 
 ### OpenAI Responses API
@@ -220,64 +244,37 @@ curl -X POST http://localhost:9655/v1/responses \
   }'
 ```
 
-### Tool calling
-
-FreeDeepseekAPI принимает:
-
-- OpenAI `tools`;
-- Anthropic `tools`;
-- Responses API function tools.
-
-Прокси просит DeepSeek вернуть строгий JSON tool call, но также умеет парсить fallback-форматы:
-
-- `TOOL_CALL:`
-- fenced JSON
-- `<tool_call>...</tool_call>`
-
 ---
 
-## 🧠 Модели
+## Модели
 
-`GET /v1/models` возвращает только aliases, которые сейчас проверены и работают через этот proxy.
-
-### Рабочие aliases
+`GET /v1/models` возвращает проверенные aliases.
 
 | Alias | Web mode | Reasoning | Web search | Комментарий |
-| --- | --- | --- | --- | --- |
-| `deepseek-chat` | `Быстрый` / `default` | нет | нет | базовый chat |
-| `deepseek-v3` | `Быстрый` / `default` | нет | нет | совместимый alias |
-| `deepseek-default` | `Быстрый` / `default` | нет | нет | совместимый alias |
-| `deepseek-reasoner` | `Быстрый` / `default` | да | нет | `thinking_enabled=true` |
-| `deepseek-r1` | `Быстрый` / `default` | да | нет | R1-compatible alias |
-| `deepseek-chat-search` | `Быстрый` / `default` | нет | да | web search |
-| `deepseek-default-search` | `Быстрый` / `default` | нет | да | web search alias |
-| `deepseek-reasoner-search` | `Быстрый` / `default` | да | да | reasoning + search |
-| `deepseek-r1-search` | `Быстрый` / `default` | да | да | R1-compatible + search |
-| `deepseek-expert` | `Эксперт` / `expert` | нет | нет | Expert mode |
-| `deepseek-v4-pro` | `Эксперт` / `expert` | да | нет | Expert + reasoning |
+|-------|----------|-----------|------------|-------------|
+| `deepseek-chat` | Быстрый / default | нет | нет | базовый chat |
+| `deepseek-v3` | Быстрый / default | нет | нет | совместимый alias |
+| `deepseek-default` | Быстрый / default | нет | нет | совместимый alias |
+| `deepseek-reasoner` | Быстрый / default | да | нет | thinking_enabled=true |
+| `deepseek-r1` | Быстрый / default | да | нет | R1-compatible alias |
+| `deepseek-chat-search` | Быстрый / default | нет | да | web search |
+| `deepseek-default-search` | Быстрый / default | нет | да | web search alias |
+| `deepseek-reasoner-search` | Быстрый / default | да | да | reasoning + search |
+| `deepseek-r1-search` | Быстрый / default | да | да | R1-compatible + search |
+| `deepseek-expert` | Эксперт / expert | нет | нет | Expert mode |
+| `deepseek-v4-pro` | Эксперт / expert | да | нет | Expert + reasoning |
 
 Полный маппинг:
-
 ```bash
 curl http://localhost:9655/v1/model-capabilities
 ```
 
-По официальной странице DeepSeek V4 Preview `deepseek-chat` и `deepseek-reasoner` сейчас route'ятся в `deepseek-v4-flash` non-thinking/thinking. В самом `chat.deepseek.com` direct stream точное имя чекпойнта не отдаётся (`model: ""`), поэтому proxy фиксирует одновременно web-режим (`default` / `Быстрый`) и актуальную официальную маршрутизацию (`DeepSeek-V4-Flash`).
-
-Текущий вывод DeepSeek Web remote config показывает такие web-режимы:
-
-- `default` / UI `Быстрый` — работает; поддерживает `thinking_enabled` и `search_enabled`.
-- `expert` / UI `Эксперт` — работает через актуальный web-контракт (`x-client-version=2.0.0`) и поддерживает `thinking_enabled`. В `/v1/models` выдаются `deepseek-expert` без reasoning и `deepseek-v4-pro` как Expert + reasoning.
-- `vision` / UI `Распознавание` — виден в remote config, но сейчас direct Web API возвращает `backend_err_by_model` (`Vision is temporarily unavailable`). Поэтому `deepseek-vision` скрыт из `/v1/models`.
-
-Search для Expert по remote config недоступен, поэтому `deepseek-expert-search` остаётся unsupported.
-
 ---
 
-## 🔌 Endpoints
+## Endpoints
 
 | Method | Path | Назначение |
-| --- | --- | --- |
+|--------|------|------------|
 | `GET` | `/` или `/health` | статус proxy |
 | `GET` | `/v1/models` | список рабочих OpenAI-compatible aliases |
 | `GET` | `/v1/model-capabilities` | полный маппинг aliases, real model, capabilities |
@@ -290,72 +287,88 @@ Search для Expert по remote config недоступен, поэтому `de
 
 ---
 
-## 🖥 Open WebUI
+## Интеграции
+
+### Open WebUI
 
 Base URL для Open WebUI в Docker:
-
-```text
+```
 http://host.docker.internal:9655/v1
 ```
 
-Для локального запуска без Docker:
-
-```text
+Локальный запуск без Docker:
+```
 http://localhost:9655/v1
 ```
 
-API key можно указать любой: proxy сам ходит в DeepSeek Web через сохранённую browser-сессию.
+API key можно указать любой.
+
+### Claude Code
+
+```bash
+export ANTHROPIC_BASE_URL="http://127.0.0.1:9655"
+export ANTHROPIC_AUTH_TOKEN=*** CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1
+claude --model deepseek-chat
+```
+
+### Hermes Agent
+
+```yaml
+model:
+  default: deepseek-chat
+  provider: custom
+  base_url: http://127.0.0.1:9655/v1
+```
+
+### OpenAI SDK (Python)
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="http://localhost:9655/v1", api_key="unused")
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[{"role": "user", "content": "Привет!"}]
+)
+```
 
 ---
 
-## 🔐 Обновить логин
+## Обновить логин
 
 ```bash
 npm run auth
-npm start
+NON_INTERACTIVE=1 npm start
 ```
 
-Если DeepSeek начал отвечать `401`, `403` или просит новый PoW/session — повторите `npm run auth` и обновите сохранённую browser-сессию.
-
-Локальные файлы авторизации не должны попадать в GitHub:
-
-- `deepseek-auth.json`
-- `.chrome-profile-deepseek/`
-- `.env`
-
-Они уже добавлены в `.gitignore`.
+Если DeepSeek начал отвечать 401, 403 — повторите авторизацию.
 
 ---
 
-## 🧪 Тесты
-
-Синтаксическая проверка проекта:
+## Тесты
 
 ```bash
+# Синтаксическая проверка
 npm test
-```
 
-Live smoke-тесты против запущенного локального proxy:
-
-```bash
+# Live smoke-тесты (сервер должен быть запущен)
 BASE_URL=http://127.0.0.1:9655 MODEL=deepseek-chat npm run test:live
 ```
 
 ---
 
-## 📌 Статус проекта
+## Статус проекта
 
-FreeDeepseekAPI — экспериментальный web-chat proxy для локального использования и интеграций. Он зависит от текущего контракта DeepSeek Web Chat, поэтому при изменениях на стороне DeepSeek может потребоваться обновление auth/session logic или model mapping.
+FreeDeepseekAPI — экспериментальный web-chat proxy для локального использования в WSL2. Он зависит от текущего контракта DeepSeek Web Chat, поэтому при изменениях на стороне DeepSeek может потребоваться обновление.
 
 Если что-то перестало работать:
-
 1. обновите логин через `npm run auth`;
 2. проверьте `/v1/model-capabilities`;
 3. повторите запрос на свежей сессии;
-4. если проблема сохраняется — вероятно, DeepSeek изменил внутренний Web API.
+4. если проблема сохраняется — DeepSeek изменил внутренний Web API.
 
 ---
 
 <p align="center">
-  <strong>ForgetMeAI</strong> · <a href="https://t.me/forgetmeai">Telegram</a>
+  <strong>Форк ForgetMeAI/FreeDeepseekAPI</strong> · Адаптация для WSL2
 </p>

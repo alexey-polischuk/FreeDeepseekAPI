@@ -40,13 +40,12 @@ function sleepSync(ms) {
 }
 
 function killExistingTestingChrome() {
-  if (process.platform !== 'darwin') return;
   const patterns = [
     `--remote-debugging-port=${port}`,
     profileDir,
   ].map(shellPatternSafe);
   for (const pattern of patterns) {
-    try { execFileSync('/usr/bin/pkill', ['-f', pattern], { stdio: 'ignore' }); } catch {}
+    try { execFileSync('pkill', ['-f', pattern], { stdio: 'ignore' }); } catch {}
   }
   sleepSync(800);
 }
@@ -73,8 +72,7 @@ function removeProfileSafely(dir) {
 function resolveChromePath() {
   if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
 
-  // Match FreeQwenApi: prefer Puppeteer's bundled "Google Chrome for Testing"
-  // instead of the user's normal /Applications/Google Chrome.app.
+  // Prefer Puppeteer's bundled "Google Chrome for Testing"
   for (const base of [repoRoot, qwenRepoRoot]) {
     try {
       const puppeteerPath = require.resolve('puppeteer', { paths: [base] });
@@ -86,17 +84,38 @@ function resolveChromePath() {
     } catch {}
   }
 
+  // Puppeteer cache — Linux layout (chrome-linux64/chrome)
   const cacheRoot = path.join(process.env.HOME || '', '.cache', 'puppeteer', 'chrome');
   try {
     const candidates = fs.readdirSync(cacheRoot)
-      .map(dir => path.join(cacheRoot, dir, 'chrome-mac-arm64', 'Google Chrome for Testing.app', 'Contents', 'MacOS', 'Google Chrome for Testing'))
+      .map(dir => {
+        // Linux Puppeteer layout
+        const linuxPath = path.join(cacheRoot, dir, 'chrome-linux64', 'chrome');
+        return linuxPath;
+      })
       .filter(p => fs.existsSync(p))
       .sort()
       .reverse();
     if (candidates[0]) return candidates[0];
   } catch {}
 
-  return '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  // WSL/Linux: common browser paths
+  const linuxPaths = [
+    '/snap/bin/chromium',                // Snap Chromium (common in Ubuntu WSL)
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium',
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/google-chrome',
+    '/mnt/c/Program Files/Google/Chrome/Application/chrome.exe',  // Windows Chrome via WSL
+  ];
+  for (const p of linuxPaths) {
+    if (fs.existsSync(p)) return p;
+  }
+
+  throw new Error(
+    'Chrome/Chromium not found. Set CHROME_PATH env variable.\n' +
+    'Example: CHROME_PATH=/snap/bin/chromium npm run auth'
+  );
 }
 
 const chromePath = resolveChromePath();
